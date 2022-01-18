@@ -1,0 +1,17 @@
+#! /usr/bin/env zsh
+
+DATABASE=${1:-database}
+DB_FILE=${DATABASE}.sqlite
+
+if [[ ! -z $2 ]]; then
+	RUN_FILE=$2
+fi
+
+echo $DB_FILE
+echo $RUN_FILE
+
+if [[ -z ${RUN_FILE} ]]; then
+	sqlite3 ${DB_FILE}
+else
+	sqlite3 ${DB_FILE} < ${RUN_FILE}
+fi

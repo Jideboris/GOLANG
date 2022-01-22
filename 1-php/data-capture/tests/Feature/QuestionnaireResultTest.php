@@ -2,15 +2,18 @@
 
 namespace Tests\Feature;
 
+use App\Models\Questionnaire;
 use App\Models\User;
 use Exception;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Tests\TestCase;
 
 class QuestionnaireResultTest extends TestCase
 {
+    use DatabaseTransactions;
+
     protected $user;
 
     public function setUp(): void
@@ -23,7 +26,7 @@ class QuestionnaireResultTest extends TestCase
     /** @test */
     public function it_requires_authentication()
     {
-        $response = $this->post('api/questionnaire_result');
+        $response = $this->postJson('api/questionnaire_result');
 
         $response->assertStatus(401);
     }
@@ -42,18 +45,34 @@ class QuestionnaireResultTest extends TestCase
     public function it_validates_request()
     {
         $response = $this->withBasicAuth($this->user)
-            ->post('api/questionnaire_result');
+            ->postJson('api/questionnaire_result');
 
-        $response->assertInvalid([
-            'questionnaire_id',
-            'results'
-        ]);
+        $response->assertJson(function (AssertableJson $json) {
+            $json->has('questionnaire_id')
+                ->has('results');
+        });
     }
     
     /** @test */
     public function it_inserts_the_correct_data_into_the_database()
     {
-        
+        // given
+        $questionnaire = Questionnaire::factory()->create();
+
+        // when
+        $response = $this->withBasicAuth($this->user)
+            ->postJson('api/questionnaire_result', [
+                'questionnaire_id' => $questionnaire->id,
+                'results' => [
+                    'q1' => 'Hello World'
+                ]
+            ]);
+
+        // then
+        $this->assertDatabaseHas('questionnaire_results', [
+            'questionnaire_id'  => $questionnaire->id,
+            'participant_id'    => $this->user->id
+        ]);
     }
     
     /** @test */

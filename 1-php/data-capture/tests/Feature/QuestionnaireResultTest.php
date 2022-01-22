@@ -2,28 +2,53 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
+use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Tests\TestCase;
 
 class QuestionnaireResultTest extends TestCase
 {
+    protected $user;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->user = User::factory()->create();
+    }
+
     /** @test */
     public function it_requires_authentication()
     {
-        
+        $response = $this->post('api/questionnaire_result');
+
+        $response->assertStatus(401);
     }
-    
+        
     /** @test */
     public function it_requires_a_post_request()
     {
-        
+        $this->expectException(MethodNotAllowedHttpException::class);
+
+        $this->withBasicAuth($this->user)
+            ->withoutExceptionHandling()
+            ->get('api/questionnaire_result');        
     }
     
     /** @test */
     public function it_validates_request()
     {
-        
+        $response = $this->withBasicAuth($this->user)
+            ->withoutExceptionHandling()
+            ->post('api/questionnaire_result');
+
+        $response->assertJsonValidationErrors([
+            'questionnaire_id',
+            'results'
+        ]);
     }
     
     /** @test */

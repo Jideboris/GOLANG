@@ -42,10 +42,9 @@ class QuestionnaireResultTest extends TestCase
     public function it_validates_request()
     {
         $response = $this->withBasicAuth($this->user)
-            ->withoutExceptionHandling()
             ->post('api/questionnaire_result');
 
-        $response->assertJsonValidationErrors([
+        $response->assertInvalid([
             'questionnaire_id',
             'results'
         ]);

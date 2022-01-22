@@ -24,4 +24,9 @@ class QuestionnaireResult extends Model
             $result->id = Str::uuid()->toString();
         });
     }
+
+    public function questionnaire()
+    {
+        return $this->belongsTo(Questionnaire::class);
+    }
 }

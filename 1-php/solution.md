@@ -6,5 +6,3 @@
 - I assumed that the validation would need to check for an existing questionnaire and scheduled questionnaire so I've included a basic seeder as well.
 
 - I created a specific database connection for tests, with the environment variable `TEST_DB_DATABASE`. Just run `php artisan migrate --database=testing`
-
-- I only mocked the SQS logic in tests, but I didn't test this functionality against a live SQS environment. I assumed that's what was intended (as there were no credentials supplied) but I'm happy to look into that if you'd like.

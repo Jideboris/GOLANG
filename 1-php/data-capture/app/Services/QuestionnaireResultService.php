@@ -14,6 +14,7 @@ class QuestionnaireResultService
      * @param string $participantID
      * @param string $answers
      * @param string|null $questionnaireScheduleID
+     * @return QuestionnaireResult
      */
     public static function createResult(
         string $questionnaireID,

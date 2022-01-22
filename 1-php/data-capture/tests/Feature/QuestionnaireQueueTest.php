@@ -31,18 +31,7 @@ class QuestionnaireQueueTest extends TestCase
             'questionnaire_schedule_id' => $schedule->id
         ]);
 
-        $clientMock = $this->getMockBuilder(SqsClient::class)
-            ->disableOriginalConstructor()
-            ->addMethods([ 'sendMessage' ])
-            ->getMock();
-
-        $clientMock->expects($this->any())
-            ->method('sendMessage')
-            ->willReturn([
-                '@metadata' => [
-                    'statusCode' => 200
-                ]
-            ]);
+        $clientMock = $this->mockSQSClient();
 
         $service = $this->partialMock(QueueService::class, function (MockInterface $mock) use ($clientMock) {
             $mock->shouldReceive('getClient')

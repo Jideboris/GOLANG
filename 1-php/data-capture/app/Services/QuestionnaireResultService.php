@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\QuestionnaireResult;
 use App\Models\ScheduledQuestionnaire;
+use Illuminate\Contracts\Queue\Queue;
 
 class QuestionnaireResultService
 {
@@ -39,7 +40,8 @@ class QuestionnaireResultService
         $result->save();
 
         if (! is_null($questionnaireScheduleID)) {
-            (new QueueService())->pushToQueue($result);
+            $queueService = app(QueueService::class);
+            $queueService->pushToQueue($result);
         }
         
         return $result;

@@ -26,7 +26,7 @@ class QuestionnaireResultService
         $result = new QuestionnaireResult();
         $result->questionnaire_id = $questionnaireID;
         $result->participant_id = $participantID;
-        $result->answers = json_encode($answers);
+        $result->answers = $answers;
 
         if (! is_null($questionnaireScheduleID)) {
             $scheduledQuestionnaire = ScheduledQuestionnaire::findOrFail($questionnaireScheduleID);
@@ -37,6 +37,10 @@ class QuestionnaireResultService
         }
 
         $result->save();
+
+        if (! is_null($questionnaireScheduleID)) {
+            (new QueueService())->pushToQueue($result);
+        }
         
         return $result;
     }

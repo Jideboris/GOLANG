@@ -5,9 +5,11 @@ namespace Tests\Feature;
 use App\Models\Questionnaire;
 use App\Models\ScheduledQuestionnaire;
 use App\Models\User;
+use App\Services\QuestionnaireResultService;
 use Exception;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Mockery\MockInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Tests\TestCase;
 
@@ -129,5 +131,22 @@ class QuestionnaireResultTest extends TestCase
             'id'        => $scheduledQuestionnaire->id,
             'status'    => 'complete'
         ]);
+    }
+
+    /** @test */
+    public function it_does_not_push_message_to_queue_when_result_has_no_schedule()
+    {
+        $participant = User::factory()->create();
+        $questionnaire = Questionnaire::factory()->create();
+
+        $this->partialMock(QueueService::class, function (MockInterface $mock) {
+            $mock->shouldNotReceive('pushToQueue');
+        });
+
+        QuestionnaireResultService::createResult(
+            $questionnaire->id,
+            $participant->id,
+            '{ "q1": "Hello World" }'
+        );
     }
 }

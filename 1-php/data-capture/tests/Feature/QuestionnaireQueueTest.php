@@ -6,17 +6,16 @@ use App\Models\Questionnaire;
 use App\Models\QuestionnaireResult;
 use App\Models\ScheduledQuestionnaire;
 use App\Models\User;
+use App\Services\QuestionnaireResultService;
 use App\Services\QueueService;
 use Tests\TestCase;
 use Aws\Sqs\SqsClient;
-use Aws\Api\Service\AwsClientTrait;
 use Mockery\MockInterface;
-use Aws\Result;
 
 class QuestionnaireQueueTest extends TestCase
 {
     /** @test */
-    public function it_pushes_a_message_to_queue()
+    public function it_can_push_message_to_queue()
     {
         // given
         $participant = User::factory()->create();

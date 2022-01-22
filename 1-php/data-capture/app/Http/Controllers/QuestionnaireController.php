@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Questionnaire;
 use App\Models\QuestionnaireResult;
 use App\Models\ScheduledQuestionnaire;
+use App\Services\QuestionnaireResultService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -31,21 +32,13 @@ class QuestionnaireController extends Controller
         // get current authed user
         $user = auth()->user();
 
-        // create new questionnaire result
-        $result = new QuestionnaireResult();
-        $result->questionnaire_id = $request->input('questionnaire_id');
-        $result->participant_id = $user->id;
-        $result->answers = json_encode($request->input('results'));
-        
-        if ($request->has('questionnaire_schedule_id')) {
-            $scheduledQuestionnaire = ScheduledQuestionnaire::findOrFail($request->input('questionnaire_schedule_id'));
-            $scheduledQuestionnaire->status = 'complete';
-            $scheduledQuestionnaire->save();
-
-            $result->questionnaire_schedule_id = $scheduledQuestionnaire->id;
-        }
-
-        $result->save();
+        // create new result
+        $result = QuestionnaireResultService::createResult(
+            $request->input('questionnaire_id'),
+            $user->id,
+            json_encode($request->input('results')),
+            $request->input('questionnaire_schedule_id')
+        );
 
         // return OK
         return response()->json([

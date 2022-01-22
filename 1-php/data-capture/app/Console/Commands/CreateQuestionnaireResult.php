@@ -6,6 +6,7 @@ use App\Models\Questionnaire;
 use App\Models\QuestionnaireResult;
 use App\Models\ScheduledQuestionnaire;
 use App\Models\User;
+use App\Services\QuestionnaireResultService;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
@@ -54,20 +55,12 @@ class CreateQuestionnaireResult extends Command
         $user = User::findOrFail($userArgument);
         $questionnaire = Questionnaire::findOrFail($questionnaireArgument);
 
-        $result = new QuestionnaireResult();
-        $result->questionnaire_id = $questionnaire->id;
-        $result->participant_id = $user->id;
-        $result->answers = file_get_contents($jsonFileArgument);
-
-        if ($scheduleOption) {
-            $scheduledQuestionnaire = ScheduledQuestionnaire::findOrFail($scheduleOption);
-            $scheduledQuestionnaire->status = 'complete';
-            $scheduledQuestionnaire->save();
-
-            $result->questionnaire_schedule_id = $scheduledQuestionnaire->id;
-        }
-
-        $result->save();
+        QuestionnaireResultService::createResult(
+            $questionnaire->id,
+            $user->id,
+            file_get_contents($jsonFileArgument),
+            $scheduleOption
+        );
 
         $this->info('Result successfully created.');
     }

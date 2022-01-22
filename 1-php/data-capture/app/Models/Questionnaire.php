@@ -18,8 +18,8 @@ class Questionnaire extends Model
     {
         parent::boot();
 
-        static::creating(function ($user) {
-            $user->id = Str::uuid()->toString();
+        static::creating(function ($questionnaie) {
+            $questionnaie->id = Str::uuid()->toString();
         });
     }
 }

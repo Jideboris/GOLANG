@@ -18,8 +18,8 @@ class ScheduledQuestionnaire extends Model
     {
         parent::boot();
 
-        static::creating(function ($user) {
-            $user->id = Str::uuid()->toString();
+        static::creating(function ($schedule) {
+            $schedule->id = Str::uuid()->toString();
         });
     }
 }

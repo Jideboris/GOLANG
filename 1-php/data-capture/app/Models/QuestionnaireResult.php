@@ -20,8 +20,8 @@ class QuestionnaireResult extends Model
     {
         parent::boot();
 
-        static::creating(function ($user) {
-            $user->id = Str::uuid()->toString();
+        static::creating(function ($result) {
+            $result->id = Str::uuid()->toString();
         });
     }
 }

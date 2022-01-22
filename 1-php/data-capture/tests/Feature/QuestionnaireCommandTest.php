@@ -2,33 +2,75 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\Questionnaire;
+use App\Models\ScheduledQuestionnaire;
+use App\Models\User;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class QuestionnaireCommandTest extends TestCase
 {
-    /** @test */
-    public function it_accepts_the_correct_arguments()
-    {
+    use DatabaseTransactions;
 
+    protected $user;
+    
+    protected $questionnaire;
+
+    protected $jsonPath = "/app/answers.json";
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->user = User::factory()->create();
+        $this->questionnaire = Questionnaire::factory()->create();
     }
     
     /** @test */
     public function it_inserts_the_correct_data_into_the_database()
     {
+        $this->artisan("questionnaire_result:create {$this->user->id} {$this->questionnaire->id} {$this->jsonPath}")
+            ->assertSuccessful();
 
+        $this->assertDatabaseHas('questionnaire_results', [
+            'questionnaire_id'  => $this->questionnaire->id,
+            'participant_id'    => $this->user->id
+        ]);
+    }
+    
+    /** @test */
+    public function it_throws_an_exception_if_json_file_does_not_exist()
+    {
+        $this->expectException(FileNotFoundException::class);
+
+        $this->artisan("questionnaire_result:create {$this->user->id} {$this->questionnaire->id} /app/noexistentfile.json")
+            ->assertExitCode(0);
     }
 
     /** @test */
-    public function it_takes_schedule_id_parameter()
+    public function it_accepts_schedule_id_parameter()
     {
+        // given
+        $schedule = ScheduledQuestionnaire::factory()->create([
+            'questionnaire_id'  => $this->questionnaire->id,
+            'participant_id'    => $this->user->id
+        ]);
 
-    }
+        // when
+        $this->artisan("questionnaire_result:create {$this->user->id} {$this->questionnaire->id} {$this->jsonPath} --schedule={$schedule->id}")
+            ->assertSuccessful();
 
-    /** @test */
-    public function it_links_result_to_schedule_and_updates_schedule_status()
-    {
+        // then
+        $this->assertDatabaseHas('questionnaire_results', [
+            'questionnaire_id'          => $this->questionnaire->id,
+            'participant_id'            => $this->user->id,
+            'questionnaire_schedule_id' => $schedule->id
+        ]);
 
+        $this->assertDatabaseHas('scheduled_questionnaires', [
+            'id'        => $schedule->id,
+            'status'    => 'complete'
+        ]);
     }
 }

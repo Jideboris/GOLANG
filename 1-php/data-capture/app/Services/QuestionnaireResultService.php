@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\QuestionnaireCompleted;
 use App\Models\QuestionnaireResult;
 use App\Models\ScheduledQuestionnaire;
 use Illuminate\Contracts\Queue\Queue;
@@ -40,8 +41,7 @@ class QuestionnaireResultService
         $result->save();
 
         if (! is_null($questionnaireScheduleID)) {
-            $queueService = app(QueueService::class);
-            $queueService->pushToQueue($result);
+            QuestionnaireCompleted::dispatch($result);
         }
         
         return $result;

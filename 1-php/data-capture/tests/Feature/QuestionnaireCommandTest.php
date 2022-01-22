@@ -2,13 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Jobs\QuestionnaireCompleted;
 use App\Models\Questionnaire;
 use App\Models\ScheduledQuestionnaire;
 use App\Models\User;
-use App\Services\QueueService;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Mockery\MockInterface;
+use Illuminate\Support\Facades\Bus;
 use Tests\TestCase;
 
 class QuestionnaireCommandTest extends TestCase
@@ -59,13 +59,7 @@ class QuestionnaireCommandTest extends TestCase
             'participant_id'    => $this->user->id
         ]);
 
-        $clientMock = $this->mockSQSClient();
-
-        $this->partialMock(QueueService::class, function (MockInterface $mock) use ($clientMock) {
-            $mock->shouldReceive('getClient')
-                ->once()
-                ->andReturn($clientMock);
-        });
+        Bus::fake();
 
         // when
         $this->artisan("questionnaire_result:create {$this->user->id} {$this->questionnaire->id} {$this->jsonPath} --schedule={$schedule->id}")
@@ -82,5 +76,7 @@ class QuestionnaireCommandTest extends TestCase
             'id'        => $schedule->id,
             'status'    => 'complete'
         ]);
+
+        Bus::assertDispatched(QuestionnaireCompleted::class);
     }
 }

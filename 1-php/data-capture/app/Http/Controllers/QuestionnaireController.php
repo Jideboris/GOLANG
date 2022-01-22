@@ -19,7 +19,8 @@ class QuestionnaireController extends Controller
         // validate request & return messages as json
         $validator = Validator::make($request->all(), [
             'questionnaire_id' => 'required|exists:questionnaires,id',
-            'results' => 'required'
+            'results' => 'required',
+            'questionnaire_schedule_id' => 'exists:scheduled_questionnaires,id'
         ]);
 
         if ($validator->fails()) {

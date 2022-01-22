@@ -76,9 +76,24 @@ class QuestionnaireResultTest extends TestCase
     }
     
     /** @test */
-    public function it_takes_additional_questionnaire_schedule_id_parameter()
+    public function it_validates_additional_questionnaire_schedule_id_parameter()
     {
-        
+        // given
+        $questionnaire = Questionnaire::factory()->create();
+
+        // when
+        $response = $this->withBasicAuth($this->user)
+            ->postJson('api/questionnaire_result', [
+                'questionnaire_id' => $questionnaire->id,
+                'questionnaire_schedule_id' => 'not_id',
+                'results' => [
+                    'q1' => 'Hello World'
+                ]
+            ]);
+
+        $response->assertJson(function (AssertableJson $json) {
+            $json->has('questionnaire_schedule_id');
+        });
     }
     
     /** @test */

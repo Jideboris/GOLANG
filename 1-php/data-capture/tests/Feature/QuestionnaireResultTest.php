@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Questionnaire;
+use App\Models\ScheduledQuestionnaire;
 use App\Models\User;
 use Exception;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -91,6 +92,7 @@ class QuestionnaireResultTest extends TestCase
                 ]
             ]);
 
+        // then
         $response->assertJson(function (AssertableJson $json) {
             $json->has('questionnaire_schedule_id');
         });
@@ -99,6 +101,33 @@ class QuestionnaireResultTest extends TestCase
     /** @test */
     public function it_links_result_to_schedule_and_updates_schedule_status()
     {
+        // given
+        $questionnaire = Questionnaire::factory()->create();
+        $scheduledQuestionnaire = ScheduledQuestionnaire::factory()->create([
+            'questionnaire_id'  => $questionnaire->id,
+            'participant_id'    => $this->user->id
+        ]);
+
+        // when
+        $response = $this->withBasicAuth($this->user)
+            ->postJson('api/questionnaire_result', [
+                'questionnaire_id' => $questionnaire->id,
+                'questionnaire_schedule_id' => $scheduledQuestionnaire->id,
+                'results' => [
+                    'q1' => 'Hello World'
+                ]
+            ]);
+
+        // then
+        $this->assertDatabaseHas('questionnaire_results', [
+            'questionnaire_id'          => $questionnaire->id,
+            'participant_id'            => $this->user->id,
+            'questionnaire_schedule_id' => $scheduledQuestionnaire->id
+        ]);
         
+        $this->assertDatabaseHas('scheduled_questionnaires', [
+            'id'        => $scheduledQuestionnaire->id,
+            'status'    => 'complete'
+        ]);
     }
 }

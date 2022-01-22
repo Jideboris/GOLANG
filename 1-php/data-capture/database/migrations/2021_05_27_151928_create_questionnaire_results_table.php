@@ -19,7 +19,7 @@ class CreateQuestionnaireResultsTable extends Migration
             $table->json('answers');
             $table->uuid('questionnaire_id');
             $table->uuid('participant_id');
-            $table->uuid('questionnaire_schedule_id');
+            $table->uuid('questionnaire_schedule_id')->nullable();
 
             $table->timestamps();
         });

@@ -1,7 +1,6 @@
 # SQL Task Solution
 
 ## 1
-```
 | questionnaire_name | participants |
 | ------------------ | ------------ |
 | Hair Colour Survey | Jenny, Alan |
@@ -13,7 +12,6 @@
 | Blood Colour Survey | Jenny, Alan |
 | Who has hands? | Alan |
 | Blood Type Survey | Alan |
-```
 ```
 SELECT 
     `questionnaires`.`name` AS 'questionnaire_name',
@@ -33,7 +31,6 @@ GROUP BY
 ```
 
 ## 2
-```
 | calendar_day | scheduled_count | completed_count |
 | ------------ | --------------- | --------------- |
 | 2021-01-01 | 18 | 9 |
@@ -62,7 +59,6 @@ GROUP BY
 | 2021-02-15 | 2 | 2 |
 | 2021-02-22 | 2 | 2 |
 ```
-```
 SELECT
 	DATE(`scheduled_questionnaires`.`scheduled_at`) AS 'calendar_day',
 	COUNT(`scheduled_questionnaires`.`id`) AS 'scheduled_count',
@@ -82,14 +78,12 @@ ORDER BY
 ```
 
 ## 3)
-```
 | participant_name | questionnaire_name | questionnaire_timestamp |
 | ---------------- | ------------------ | ----------------------- |
 | Limmy | Who has legs? | 2021-01-01 12:00:00 |
 | Limmy | Arm survey | 2021-01-03 12:00:00 |
 | Limmy | Blood Type Survey | 2021-01-02 12:00:00 |
 | Limmy | Hair Qualitity Survey | 2021-01-04 12:00:00 |
-```
 ```
 SELECT
 	`participants`.`name` AS 'participant_name',

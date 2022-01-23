@@ -7,4 +7,4 @@
 
 - I created a specific database connection for tests, with the environment variable `TEST_DB_DATABASE`. Just run `php artisan migrate --database=testing`
 
-- I wasn't entirely sure what was meant for task four. Initially I wrote my own message logic with the AWS SDK (commits `1d2af21...30e2bba`) but later replaced this with a job, which was a bit simpler. Happy to explain both approaches.
+- For task four, initially I wrote my own message logic with the AWS SDK (commits `1d2af21...30e2bba`) but later replaced this with a job, which was a bit simpler to test. I'm happy to explain both approaches.

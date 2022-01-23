@@ -1,4 +1,4 @@
-# Tim's Solutions
+# SQL Task Solution
 
 ## 1
 ```

@@ -13,7 +13,7 @@ use Illuminate\Testing\Fluent\AssertableJson;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Tests\TestCase;
 
-class QuestionnaireResultTest extends TestCase
+class QuestionnaireRequestTest extends TestCase
 {
     use DatabaseTransactions;
 

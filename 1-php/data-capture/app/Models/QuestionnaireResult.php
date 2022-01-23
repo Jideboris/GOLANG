@@ -14,7 +14,7 @@ class QuestionnaireResult extends Model
 
     protected $keyType = 'string';
 
-    protected $hidden = ['id'];
+    protected $hidden = ['id', 'questionnaire'];
 
     public static function boot()
     {

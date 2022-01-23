@@ -1,6 +1,6 @@
 # SQL Task Solution
 
-## 1
+## 1)
 | questionnaire_name | participants |
 | ------------------ | ------------ |
 | Hair Colour Survey | Jenny, Alan |
@@ -30,7 +30,7 @@ GROUP BY
     `scheduled_questionnaires`.`questionnaire_id`;
 ```
 
-## 2
+## 2)
 | calendar_day | scheduled_count | completed_count |
 | ------------ | --------------- | --------------- |
 | 2021-01-01 | 18 | 9 |

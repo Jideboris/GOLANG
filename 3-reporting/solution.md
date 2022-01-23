@@ -109,4 +109,5 @@ AND (
 	`scheduled_questionnaires`.`status` = 'pending'
 	OR `scheduled_questionnaires`.`status` IS NULL
 )
+ORDER BY `questionnaire_results`.`completed_at` ASC
 ```

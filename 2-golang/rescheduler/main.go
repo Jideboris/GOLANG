@@ -6,6 +6,7 @@ import (
 	"log"
 	"github.com/aws/aws-lambda-go/lambda"
 	"database/sql"
+	"github.com/nu7hatch/gouuid"
 	// Assume that credentials is a package that contains getters for any
 	// credentials needed (database dsn's etc.).
 	//
@@ -41,10 +42,15 @@ type ScheduledUserQuestionnairesCompletedEvent struct {
 }
 
 func GenerateId() string {
-	// returns uuid
+	uuid, err := uuid.NewV4()
+	if err != nil {
+		panic(err.Error())
+	}
+	return uuid.String()
 }
 
-func SaveToDatabase(messages chan<- NewScheduleCreatedEvent, event QuestionnaireCompletedEvent) {
+func SaveToDatabase(event QuestionnaireCompletedEvent) ScheduledQuestionnaire {
+	// open db connection with known credentials
 	db, err := sql.Open("mysql", credentials.MySqlDsn())
 
 	if err != nil {
@@ -55,7 +61,7 @@ func SaveToDatabase(messages chan<- NewScheduleCreatedEvent, event Questionnaire
 		Id: GenerateId(),
 		UserId: event.UserId,
 		StudyId: event.StudyId,
-		QuestionnaireId: event.QuestionnaireId
+		QuestionnaireId: event.QuestionnaireId,
 	}
 
 	// insert newScheduledQuestionnaire into database
@@ -65,39 +71,44 @@ func SaveToDatabase(messages chan<- NewScheduleCreatedEvent, event Questionnaire
         panic(err.Error())
     }
 
-	messages <- NewScheduleCreatedEvent{
-		ScheduleId: newScheduledQuestionnaire.Id
-	}
+	log.Printf("Schedule %s created.", newScheduledQuestionnaire.Id)
 
 	// close db connection
 	insert.Close()
+
+	return newScheduledQuestionnaire
 }
 
-func SendNewScheduleMessage(messages <-chan NewScheduleCreatedEvent) {
-	// send message to sqs
+func SendNewScheduleMessage(questionnaire ScheduledQuestionnaire) {
+	message := NewScheduleCreatedEvent{
+		ScheduleId: questionnaire.Id,
+	}
+
+	// dispatch message to sqs...
+
+	log.Printf("Schedule %s creation message sent.", message.ScheduleId)
 }
 
-func SendQuestionnairesCompletedMessage(messages <-chan ScheduledUserQuestionnairesCompletedEvent) {
-	// send message to sqs
+func SendQuestionnairesCompletedMessage(event QuestionnaireCompletedEvent) {
+	message := ScheduledUserQuestionnairesCompletedEvent{
+		UserId: event.UserId,
+		CompletedAt: event.CompletedAt,
+	}
+
+	// dispatch message to sqs...
+
+	log.Printf("All questionnaires for user %s completed.", message.UserId)
 }
 
 func LambdaHander(ctx context.Context, event QuestionnaireCompletedEvent) (string, error) {
 	log.Print("Running ƛ %s", ctx.FunctionName)
 
-	newSchedules = make(chan NewScheduleCreatedEvent)
-	completedQuestionnaireUsers = make(chan ScheduledUserQuestionnairesCompletedEvent)
-
 	if event.RemainingCompletions >= 1 {
-		go SaveToDatabase(newSchedules, event)
+		scheduledQuestionnaire := SaveToDatabase(event)
+		SendNewScheduleMessage(scheduledQuestionnaire)
 	} else {
-		completedQuestionnaireUsers <- ScheduledUserQuestionnairesCompletedEvent{
-			UserId: event.UserId,
-			CompletedAt: event.CompletedAt
-		}
+		SendQuestionnairesCompletedMessage(event)
 	}
-
-	go SendNewScheduleMessage(newSchedules)
-	go SendQuestionnairesCompletedMessage(completedQuestionnaireUsers)
 
 	return fmt.Sprintf("Hello %s!", event.StudyId), nil
 }

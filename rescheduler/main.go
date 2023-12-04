@@ -111,7 +111,7 @@ func main() {
 
 	go startUp(db, cfg, &wg)
 
-	go SendLambdaMessage(ctx, QuestionnaireCompletedEvent{}, &wg)
+    go SendLambdaMessage(ctx, QuestionnaireCompletedEvent{}, &wg)
 
 	wg.Wait()
 }

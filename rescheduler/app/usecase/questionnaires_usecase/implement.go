@@ -112,5 +112,4 @@ func (uc *usecase) CreateTable() (bool, error) {
 		log.Printf("rows affected: %d\n", no)
 	}
 	return true, nil
-
 }

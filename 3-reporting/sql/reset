@@ -1,8 +1,0 @@
-#! /usr/bin/env zsh
-
-DATABASE=${1:-database}
-DB_FILE=${DATABASE}.sqlite
-
-rm -f ${DB_FILE}
-
-sqlite3 ${DB_FILE} < ./seeders/*.sql

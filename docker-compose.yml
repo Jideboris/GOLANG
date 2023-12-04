@@ -1,0 +1,17 @@
+version: '2'
+services:
+  mysql:
+    container_name: gotest_mysql
+    restart: on-failure:5 
+    image: mysql:latest
+    ports:
+        - 3306:3306
+    environment:
+      MYSQL_USER: gotest
+      MYSQL_PASSWORD: 1234
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: questionnairesDB
+    volumes:
+      - my-datavolume:/var/lib/mysql
+volumes:
+  my-datavolume:

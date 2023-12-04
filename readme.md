@@ -1,15 +1,18 @@
-# Tim's uMotif Backend Challenge Solution
-
-I've included a 'solution.md' in each directory that includes my answers or any relevant notes.
-
-I've also included my git repo in the root directory so you can see the changes I made.
-
-If you have any questions about any of the code here feel free to send me an email any time at tr.white@outlook.com. Any feedback you can provide would also be great; I'm always looking for ways to improve.
-
-----
-
 Main Code Test
 ==============
+
+## NOTE (ANTHONY BORISADE)
+1. The test was done trying to implement CLEAN architecture as much as possible.
+1. Please just download this project and run docker-compose up -d
+2. Ensure you docker is up and running though.
+3. It should run end to end, that is, create table schemas and generate data.
+4. Lambda SQS could not be completed due to require configuration.
+5. In order to see created tables with data stored, gorountime function to run the lambda was commented out as shown below:
+     // go SendLambdaMessage(ctx, QuestionnaireCompletedEvent{}, &wg)
+6. Sample unit test was setup and run using command below:
+  go test -v handler/handler_test.go
+
+
 
 ## Code Test Overview
 
@@ -22,6 +25,7 @@ The goal of this test is to see how well you approach situations and to gauge yo
 * Show your working / Be generous with your comments
 * **Use Google!** - do not be afraid to look up references!
 * How long you put into the test is up to yourself, but we recommend only a few hours in total.
+* Details of what you should do are in task.md
 
 
 **Read all READMEs carefully before coding and heed the notes and advice in each!**
@@ -30,16 +34,6 @@ The goal of this test is to see how well you approach situations and to gauge yo
 ## Abstract
 
 One way of capturing data from a participant in a study is to get them to fill in a Questionnaire.
-
-There are three stages to this test:
-
-1. [PHP / Laravel](1-php/readme.md)
-2. [Golang / Lambda](2-golang/readme.md)
-3. [Reporting / SQL](3-reporting/readme.md)
-
-* If you do not know Laravel that's okay, this is not a Laravel test.  Just pretend it's another MVC framework that you have familiarity with (Symfony, Zend, etc).  It won't be held against you.
-* If you have no knowledge of Go, you can skip this part entirely.  
-* Likewise if you have Go knowledge, but no PHP knowledge then you can skip the PHP part entirely.
 
 ## Database Structure
 
@@ -111,3 +105,7 @@ If it was part of a schedule, then it will be linked to the schedule as well thr
 ## Scheduling
 
 The `Questionnaire` model represents the abstract questionnaire configuration. A `Questionnaire Schedule` represents a specific request for a participant to fill in a `Questionnaire`.
+
+
+
+
